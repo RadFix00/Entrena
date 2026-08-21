@@ -5,6 +5,8 @@ import {
   useState,
 } from "react";
 
+import Link from "next/link";
+
 import {
   signIn,
 } from "next-auth/react";
@@ -51,15 +53,26 @@ export default function LoginPage() {
   ) {
     event.preventDefault();
 
+    if (cargando) {
+      return;
+    }
+
     try {
       setCargando(true);
       setError("");
+
+      const emailLimpio =
+        email
+          .trim()
+          .toLowerCase();
 
       const resultado =
         await signIn(
           "credentials",
           {
-            email,
+            email:
+              emailLimpio,
+
             password,
 
             /*
@@ -98,7 +111,9 @@ export default function LoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
       <div className="w-full max-w-md">
-        {/* Logo */}
+        {/* ====================================== */}
+        {/* LOGO */}
+        {/* ====================================== */}
 
         <div className="mb-8 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-sm">
@@ -116,7 +131,9 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* Card */}
+        {/* ====================================== */}
+        {/* CARD */}
+        {/* ====================================== */}
 
         <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
           <div>
@@ -136,7 +153,9 @@ export default function LoginPage() {
             }
             className="mt-6 space-y-5"
           >
-            {/* Email */}
+            {/* ================================== */}
+            {/* EMAIL */}
+            {/* ================================== */}
 
             <div>
               <label
@@ -157,7 +176,12 @@ export default function LoginPage() {
                   type="email"
                   autoComplete="email"
                   required
-                  value={email}
+                  disabled={
+                    cargando
+                  }
+                  value={
+                    email
+                  }
                   onChange={(
                     event
                   ) =>
@@ -167,20 +191,31 @@ export default function LoginPage() {
                     )
                   }
                   placeholder="correo@ejemplo.com"
-                  className="h-11 w-full rounded-xl border border-slate-200 pl-10 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                  className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-50"
                 />
               </div>
             </div>
 
-            {/* Password */}
+            {/* ================================== */}
+            {/* PASSWORD */}
+            {/* ================================== */}
 
             <div>
-              <label
-                htmlFor="password"
-                className="mb-2 block text-sm font-semibold text-slate-700"
-              >
-                Contraseña
-              </label>
+              <div className="mb-2 flex items-center justify-between gap-4">
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-semibold text-slate-700"
+                >
+                  Contraseña
+                </label>
+
+                <Link
+                  href="/forgot-password"
+                  className="text-xs font-semibold text-emerald-600 transition hover:text-emerald-700 hover:underline"
+                >
+                  ¿Olvidaste tu contraseña?
+                </Link>
+              </div>
 
               <div className="relative">
                 <LockKeyhole
@@ -198,7 +233,12 @@ export default function LoginPage() {
                   autoComplete="current-password"
                   required
                   minLength={8}
-                  value={password}
+                  disabled={
+                    cargando
+                  }
+                  value={
+                    password
+                  }
                   onChange={(
                     event
                   ) =>
@@ -208,18 +248,21 @@ export default function LoginPage() {
                     )
                   }
                   placeholder="Tu contraseña"
-                  className="h-11 w-full rounded-xl border border-slate-200 pl-10 pr-12 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+                  className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-12 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-50"
                 />
 
                 <button
                   type="button"
+                  disabled={
+                    cargando
+                  }
                   onClick={() =>
                     setMostrarPassword(
                       (actual) =>
                         !actual
                     )
                   }
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1 text-slate-400 hover:text-slate-700"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
                   aria-label={
                     mostrarPassword
                       ? "Ocultar contraseña"
@@ -239,7 +282,9 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Error */}
+            {/* ================================== */}
+            {/* ERROR */}
+            {/* ================================== */}
 
             {error && (
               <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
@@ -247,7 +292,9 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Botón */}
+            {/* ================================== */}
+            {/* BOTÓN */}
+            {/* ================================== */}
 
             <button
               type="submit"
@@ -263,9 +310,12 @@ export default function LoginPage() {
           </form>
         </div>
 
+        {/* ====================================== */}
+        {/* FOOTER */}
+        {/* ====================================== */}
+
         <p className="mt-6 text-center text-xs text-slate-400">
-          Entrena · Plataforma de
-          entrenamiento
+          Entrena · Plataforma de entrenamiento
         </p>
       </div>
     </main>

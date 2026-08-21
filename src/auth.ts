@@ -26,12 +26,11 @@ export const {
   signOut,
 } = NextAuth({
   /*
-   * Como estamos usando email + contraseña,
-   * utilizaremos una sesión JWT.
-   *
-   * Auth.js cifra el JWT utilizando
-   * AUTH_SECRET.
+   * ==========================================================
+   * SESIONES JWT
+   * ==========================================================
    */
+
   session: {
     strategy: "jwt",
 
@@ -42,6 +41,12 @@ export const {
   pages: {
     signIn: "/login",
   },
+
+  /*
+   * ==========================================================
+   * PROVIDERS
+   * ==========================================================
+   */
 
   providers: [
     Credentials({
@@ -75,8 +80,11 @@ export const {
         } = resultado.data;
 
         /*
-         * Buscamos al usuario en PostgreSQL.
+         * ========================================
+         * BUSCAR USUARIO
+         * ========================================
          */
+
         const user =
           await prisma.user.findUnique({
             where: {
@@ -89,6 +97,11 @@ export const {
               email: true,
               passwordHash: true,
               role: true,
+
+              /*
+               * Versión actual de sesiones.
+               */
+              sessionVersion: true,
             },
           });
 
@@ -96,12 +109,19 @@ export const {
          * No revelamos si falló el correo
          * o la contraseña.
          */
+
         if (
           !user ||
           !user.passwordHash
         ) {
           return null;
         }
+
+        /*
+         * ========================================
+         * VERIFICAR PASSWORD
+         * ========================================
+         */
 
         const passwordCorrecto =
           await compare(
@@ -113,6 +133,12 @@ export const {
           return null;
         }
 
+        /*
+         * ========================================
+         * USUARIO AUTENTICADO
+         * ========================================
+         */
+
         return {
           id: user.id,
 
@@ -121,46 +147,209 @@ export const {
           email: user.email,
 
           role: user.role,
+
+          /*
+           * Se copiará posteriormente al JWT.
+           */
+          sessionVersion:
+            user.sessionVersion,
         };
       },
     }),
   ],
 
+  /*
+   * ==========================================================
+   * CALLBACKS
+   * ==========================================================
+   */
+
   callbacks: {
     /*
-     * Cuando se crea el JWT guardamos
-     * únicamente lo necesario:
+     * ========================================================
+     * JWT
+     * ========================================================
      *
-     * user ID
-     * role
+     * Se ejecuta al iniciar sesión y cuando Auth.js
+     * vuelve a procesar una sesión JWT.
      */
+
     async jwt({
       token,
       user,
     }) {
+      /*
+       * ========================================
+       * LOGIN NUEVO
+       * ========================================
+       */
+
       if (user) {
-        token.id = user.id;
+        token.id =
+          user.id;
 
         token.role =
           user.role;
+
+        /*
+         * Auth.js no conoce automáticamente
+         * nuestras propiedades personalizadas.
+         */
+
+        const sessionVersion =
+          "sessionVersion" in user
+            ? user.sessionVersion
+            : undefined;
+
+        token.sessionVersion =
+          typeof sessionVersion ===
+          "number"
+            ? sessionVersion
+            : 0;
+
+        return token;
       }
 
-      return token;
+      /*
+       * ========================================
+       * SESIÓN EXISTENTE
+       * ========================================
+       */
+
+      const userId =
+        typeof token.id ===
+        "string"
+          ? token.id
+          : typeof token.sub ===
+              "string"
+            ? token.sub
+            : null;
+
+      const tokenSessionVersion =
+        typeof token.sessionVersion ===
+        "number"
+          ? token.sessionVersion
+          : null;
+
+      /*
+       * Tokens anteriores a esta implementación
+       * no tienen sessionVersion.
+       *
+       * Los invalidamos deliberadamente.
+       */
+      if (
+        !userId ||
+        tokenSessionVersion ===
+          null
+      ) {
+        return null;
+      }
+
+      /*
+       * ========================================
+       * VALIDAR CONTRA POSTGRESQL
+       * ========================================
+       */
+
+      try {
+        const currentUser =
+          await prisma.user.findUnique({
+            where: {
+              id: userId,
+            },
+
+            select: {
+              sessionVersion: true,
+              role: true,
+            },
+          });
+
+        /*
+         * Usuario eliminado.
+         */
+        if (!currentUser) {
+          return null;
+        }
+
+        /*
+         * ======================================
+         * INVALIDACIÓN DE SESIÓN
+         * ======================================
+         *
+         * Ejemplo:
+         *
+         * JWT              = 2
+         * PostgreSQL       = 3
+         *
+         * La sesión pertenece a una versión
+         * anterior y deja de ser válida.
+         */
+
+        if (
+          currentUser.sessionVersion !==
+          tokenSessionVersion
+        ) {
+          return null;
+        }
+
+        /*
+         * Aprovechamos la consulta para mantener
+         * actualizado el rol.
+         */
+        token.role =
+          currentUser.role;
+
+        return token;
+      } catch (error) {
+        /*
+         * Si PostgreSQL tiene un fallo temporal
+         * no destruimos inmediatamente la cookie
+         * del usuario.
+         *
+         * Las consultas posteriores a BD
+         * igualmente fallarán hasta recuperar
+         * la conexión.
+         */
+
+        console.error(
+          "Error validando sessionVersion:",
+          error
+        );
+
+        return token;
+      }
     },
 
     /*
-     * Exponemos ID y rol a la sesión.
+     * ========================================================
+     * SESSION
+     * ========================================================
      */
+
     async session({
       session,
       token,
     }) {
       if (session.user) {
-        session.user.id =
-          token.id;
+        if (
+          typeof token.id ===
+          "string"
+        ) {
+          session.user.id =
+            token.id;
+        }
 
-        session.user.role =
-          token.role;
+        if (
+          token.role ===
+            "ADMIN" ||
+          token.role ===
+            "TRAINER" ||
+          token.role ===
+            "CLIENT"
+        ) {
+          session.user.role =
+            token.role;
+        }
       }
 
       return session;

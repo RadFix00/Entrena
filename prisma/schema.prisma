@@ -33,12 +33,13 @@ enum WorkoutSessionStatus {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  name         String
-  email        String   @unique
-  passwordHash String?
-  role         UserRole
-  avatarUrl    String?
+  id             String   @id @default(cuid())
+  name           String
+  email          String   @unique
+  passwordHash   String?
+  role           UserRole
+  avatarUrl      String?
+  sessionVersion Int      @default(0)
 
   profile Profile?
 
@@ -57,6 +58,11 @@ model User {
    * Historial físico del usuario.
    */
   bodyMeasurements BodyMeasurement[]
+
+  /**
+   * Tokens de recuperación de contraseña.
+   */
+  passwordResetTokens PasswordResetToken[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -141,6 +147,20 @@ model PlanWeek {
   updatedAt DateTime @updatedAt
 
   @@unique([planId, number])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
 }
 
 model WorkoutDay {

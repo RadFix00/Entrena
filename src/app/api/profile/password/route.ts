@@ -246,15 +246,21 @@ export async function PUT(
 
   try {
     await prisma.user.update({
-      where: {
-        id:
-          usuario.id,
-      },
+    where: {
+        id: usuario.id,
+    },
 
-      data: {
+    data: {
         passwordHash:
-          nuevoHash,
-      },
+        nuevoHash,
+
+        /*
+        * Invalida todos los JWT existentes.
+        */
+        sessionVersion: {
+        increment: 1,
+        },
+    },
     });
 
     return Response.json({

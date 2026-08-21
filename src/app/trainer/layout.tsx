@@ -10,36 +10,44 @@ export default async function TrainerLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  /*
-   * Si no existe sesión:
-   * → /login
-   *
-   * Si es CLIENT:
-   * → /client/dashboard
-   *
-   * Si es TRAINER / ADMIN:
-   * → continúa
-   */
   await requireTrainer();
 
   return (
     <div className="min-h-screen bg-slate-50 lg:flex">
-      {/* SIDEBAR */}
+      {/* Sidebar desktop + drawer mobile */}
 
       <TrainerSidebar />
 
-      {/* CONTENIDO PRINCIPAL */}
+      {/* Área principal */}
 
       <div className="min-w-0 flex-1">
-        {/* BARRA SUPERIOR */}
+        {/* ====================================== */}
+        {/* HEADER */}
+        {/* ====================================== */}
 
-        <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-slate-50/90 backdrop-blur">
-          <div className="flex min-h-16 items-center justify-end px-4 sm:px-6 lg:px-8">
-            <AccountMenuServer />
+        <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-slate-50/90 backdrop-blur-xl">
+          <div className="flex min-h-16 items-center justify-between px-4 sm:px-6 lg:justify-end lg:px-8">
+            {/*
+             * En móvil dejamos espacio reservado
+             * para hamburguesa + logo del sidebar.
+             */}
+
+            <div
+              className="h-10 w-28 sm:w-40 lg:hidden"
+              aria-hidden="true"
+            />
+
+            {/* Cuenta */}
+
+            <div className="ml-auto shrink-0">
+              <AccountMenuServer />
+            </div>
           </div>
         </header>
 
-        {/* PÁGINAS */}
+        {/* ====================================== */}
+        {/* CONTENIDO */}
+        {/* ====================================== */}
 
         <main className="min-w-0">
           {children}
