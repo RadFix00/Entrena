@@ -1,0 +1,354 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  TRAINER
+  CLIENT
+  ADMIN
+}
+
+enum ClientStatus {
+  ACTIVE
+  REVIEW
+  PAUSED
+}
+
+enum PlanStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  ARCHIVED
+}
+
+enum WorkoutSessionStatus {
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  name         String
+  email        String   @unique
+  passwordHash String?
+  role         UserRole
+  avatarUrl    String?
+
+  profile Profile?
+
+  trainerClients TrainerClient[] @relation("TrainerClients")
+  clientTrainers TrainerClient[] @relation("ClientTrainers")
+
+  plansCreated  TrainingPlan[] @relation("TrainerPlans")
+  plansReceived TrainingPlan[] @relation("ClientPlans")
+
+  exercises Exercise[] @relation("TrainerExercises")
+
+  workoutSessionsAsTrainer WorkoutSession[] @relation("TrainerWorkoutSessions")
+  workoutSessionsAsClient  WorkoutSession[] @relation("ClientWorkoutSessions")
+
+  /**
+   * Historial físico del usuario.
+   */
+  bodyMeasurements BodyMeasurement[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Profile {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  phone           String?
+  birthDate       DateTime?
+  goal            String?
+  heightCm        Decimal?  @db.Decimal(5, 2)
+  currentWeightKg Decimal?  @db.Decimal(6, 2)
+  startWeightKg   Decimal?  @db.Decimal(6, 2)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TrainerClient {
+  id String @id @default(cuid())
+
+  trainerId String
+  clientId  String
+
+  status ClientStatus @default(ACTIVE)
+  notes  String?
+
+  trainer User @relation("TrainerClients", fields: [trainerId], references: [id], onDelete: Cascade)
+  client  User @relation("ClientTrainers", fields: [clientId], references: [id], onDelete: Cascade)
+
+  joinedAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([trainerId, clientId])
+  @@index([trainerId])
+  @@index([clientId])
+}
+
+model TrainingPlan {
+  id String @id @default(cuid())
+
+  trainerId String
+  clientId  String
+
+  name      String
+  objective String?
+
+  status PlanStatus @default(DRAFT)
+
+  startDate DateTime?
+  endDate   DateTime?
+
+  trainer User @relation("TrainerPlans", fields: [trainerId], references: [id], onDelete: Cascade)
+  client  User @relation("ClientPlans", fields: [clientId], references: [id], onDelete: Cascade)
+
+  weeks    PlanWeek[]
+  sessions WorkoutSession[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([trainerId])
+  @@index([clientId])
+  @@index([status])
+}
+
+model PlanWeek {
+  id String @id @default(cuid())
+
+  planId String
+  number Int
+
+  plan TrainingPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  days WorkoutDay[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([planId, number])
+}
+
+model WorkoutDay {
+  id String @id @default(cuid())
+
+  weekId String
+
+  name        String
+  description String?
+  position    Int
+
+  week PlanWeek @relation(fields: [weekId], references: [id], onDelete: Cascade)
+
+  exercises WorkoutExercise[]
+  sessions  WorkoutSession[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([weekId, position])
+  @@index([weekId])
+}
+
+model Exercise {
+  id String @id @default(cuid())
+
+  trainerId String?
+
+  name        String
+  description String?
+  muscleGroup String?
+  videoUrl    String?
+
+  trainer User? @relation("TrainerExercises", fields: [trainerId], references: [id], onDelete: SetNull)
+
+  assignments WorkoutExercise[]
+  logs        ExerciseLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([trainerId, name])
+  @@index([trainerId])
+}
+
+model WorkoutExercise {
+  id String @id @default(cuid())
+
+  workoutDayId String
+  exerciseId   String
+
+  position Int
+
+  sets        Int
+  reps        String
+  loadKg      Decimal? @db.Decimal(7, 2)
+  restSeconds Int      @default(90)
+  notes       String?
+
+  workoutDay WorkoutDay @relation(fields: [workoutDayId], references: [id], onDelete: Cascade)
+  exercise   Exercise   @relation(fields: [exerciseId], references: [id], onDelete: Restrict)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([workoutDayId, position])
+  @@index([workoutDayId])
+  @@index([exerciseId])
+}
+
+model WorkoutSession {
+  id String @id @default(cuid())
+
+  trainerId String
+  clientId  String
+
+  planId       String?
+  workoutDayId String?
+
+  planName    String
+  weekNumber  Int
+  dayName     String
+  dayPosition Int?
+
+  status WorkoutSessionStatus @default(IN_PROGRESS)
+
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+
+  notes String?
+
+  trainer User @relation("TrainerWorkoutSessions", fields: [trainerId], references: [id], onDelete: Cascade)
+  client  User @relation("ClientWorkoutSessions", fields: [clientId], references: [id], onDelete: Cascade)
+
+  plan TrainingPlan? @relation(fields: [planId], references: [id], onDelete: SetNull)
+
+  workoutDay WorkoutDay? @relation(fields: [workoutDayId], references: [id], onDelete: SetNull)
+
+  exercises ExerciseLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([trainerId])
+  @@index([clientId])
+  @@index([clientId, status])
+  @@index([planId])
+  @@index([workoutDayId])
+  @@index([completedAt])
+}
+
+model ExerciseLog {
+  id String @id @default(cuid())
+
+  sessionId  String
+  exerciseId String?
+
+  position Int
+
+  exerciseName String
+  muscleGroup  String?
+
+  prescribedSets        Int
+  prescribedReps        String
+  prescribedLoadKg      Decimal? @db.Decimal(7, 2)
+  prescribedRestSeconds Int
+  prescribedNotes       String?
+
+  notes String?
+
+  session WorkoutSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  exercise Exercise? @relation(fields: [exerciseId], references: [id], onDelete: SetNull)
+
+  sets SetLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([sessionId, position])
+  @@index([sessionId])
+  @@index([exerciseId])
+}
+
+model SetLog {
+  id String @id @default(cuid())
+
+  exerciseLogId String
+
+  setNumber Int
+
+  reps   Int?
+  loadKg Decimal? @db.Decimal(7, 2)
+
+  completed Boolean @default(false)
+
+  notes String?
+
+  exerciseLog ExerciseLog @relation(fields: [exerciseLogId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([exerciseLogId, setNumber])
+  @@index([exerciseLogId])
+}
+
+/**
+ * ============================================================
+ * PROGRESO FÍSICO
+ * ============================================================
+ * Cada fila representa una medición histórica.
+ * No reemplaza Profile.currentWeightKg:
+ * Profile.currentWeightKg
+ * = valor actual rápido
+ * BodyMeasurement
+ * = historial completo
+ */
+model BodyMeasurement {
+  id String @id @default(cuid())
+
+  clientId String
+
+  /**
+   * Todos opcionales porque una medición
+   * puede contener solo peso o también
+   * medidas corporales.
+   */
+  weightKg Decimal? @db.Decimal(6, 2)
+
+  waistCm Decimal? @db.Decimal(6, 2)
+  chestCm Decimal? @db.Decimal(6, 2)
+  hipCm   Decimal? @db.Decimal(6, 2)
+  armCm   Decimal? @db.Decimal(6, 2)
+  thighCm Decimal? @db.Decimal(6, 2)
+
+  notes String?
+
+  /**
+   * Fecha real de la medición.
+   */
+  measuredAt DateTime @default(now())
+
+  client User @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([clientId])
+  @@index([clientId, measuredAt])
+}
