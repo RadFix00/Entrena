@@ -541,6 +541,17 @@ export default async function ClientDashboardPage() {
             Mi progreso
           </Link>
 
+          <Link
+            href="/client/fuerza"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+          >
+            <Dumbbell
+              size={17}
+            />
+
+            Mi fuerza
+          </Link>
+
           {/* HISTORIAL */}
 
           <Link
@@ -552,6 +563,16 @@ export default async function ClientDashboardPage() {
             />
 
             Historial
+          </Link>
+          <Link
+            href="/client/calendario"
+            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+          >
+            <CalendarDays
+              size={17}
+            />
+
+            Mi calendario
           </Link>
 
           {/* ENTRENADOR */}

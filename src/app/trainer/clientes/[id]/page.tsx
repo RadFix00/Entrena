@@ -9,6 +9,7 @@ import {
 import {
   ArrowLeft,
   CalendarDays,
+  BarChart3,
   CheckCircle2,
   ClipboardList,
   Dumbbell,
@@ -441,6 +442,28 @@ export default async function ClientePage({
               />
 
               Progreso físico
+            </Link>
+
+            <Link
+              href={`/trainer/clientes/${cliente.id}/calendario`}
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-blue-200 bg-blue-50 px-4 text-sm font-semibold text-blue-700 transition hover:bg-blue-100"
+            >
+              <CalendarDays
+                size={17}
+              />
+
+              Calendario
+            </Link>
+
+            <Link
+              href={`/trainer/clientes/${cliente.id}/adherencia`}
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 text-sm font-semibold text-emerald-700 transition hover:bg-emerald-100"
+            >
+              <BarChart3
+                size={17}
+              />
+
+              Adherencia
             </Link>
           </div>
         </div>

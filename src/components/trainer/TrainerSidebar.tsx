@@ -9,6 +9,7 @@ import {
   Dumbbell,
   BarChart3,
   Settings,
+  BellRing,
 } from "lucide-react";
 
 const menuItems = [
@@ -36,6 +37,11 @@ const menuItems = [
     name: "Progreso",
     href: "/trainer/progreso",
     icon: BarChart3,
+  },
+  {
+    href: "/trainer/alertas",
+    name: "Alertas",
+    icon: BellRing,
   },
 ];
 

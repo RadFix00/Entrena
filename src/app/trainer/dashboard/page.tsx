@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import UserAvatar from "@/components/profile/UserAvatar";
+import TrainerRiskDashboardPanel from "@/components/trainer/TrainerRiskDashboardPanel";
 
 import {
   ArrowRight,
@@ -508,7 +509,11 @@ export default async function TrainerDashboardPage() {
             </div>
           </div>
         </div>
+
+                  
       </section>
+
+      
 
       {/* SEGUNDA MÉTRICA */}
 
@@ -529,13 +534,19 @@ export default async function TrainerDashboardPage() {
               entrenamientosUltimos7Dias
             }
           </strong>
+
+          
         </div>
       </section>
 
       {/* CONTENIDO */}
 
+      
+
       <section className="mt-6 grid gap-6 xl:grid-cols-[1.35fr_1fr]">
         {/* CLIENTES */}
+
+        <TrainerRiskDashboardPanel />
 
         <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
           <div className="flex items-center justify-between border-b border-slate-100 p-5">
@@ -662,6 +673,8 @@ export default async function TrainerDashboardPage() {
             </div>
           )}
         </div>
+
+    
 
         {/* ENTRENAMIENTOS RECIENTES */}
 

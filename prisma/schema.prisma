@@ -148,9 +148,10 @@ model WorkoutDay {
 
   weekId String
 
-  name        String
-  description String?
-  position    Int
+  name          String
+  description   String?
+  position      Int
+  scheduledDate DateTime?
 
   week PlanWeek @relation(fields: [weekId], references: [id], onDelete: Cascade)
 
@@ -162,6 +163,7 @@ model WorkoutDay {
 
   @@unique([weekId, position])
   @@index([weekId])
+  @@index([scheduledDate])
 }
 
 model Exercise {
