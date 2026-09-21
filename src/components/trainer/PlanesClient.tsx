@@ -672,6 +672,21 @@ function PlanCard({
             
             />
 
+          <CopiarPlanClienteButton
+            planId={
+              plan.id
+            }
+            planNombre={
+              plan.nombre
+            }
+            clientIdActual={
+              plan.clientId
+            }
+            clientes={
+              clientes
+            }
+          />
+
           {/* ================================== */}
           {/* ACTIVE */}
           {/* ================================== */}

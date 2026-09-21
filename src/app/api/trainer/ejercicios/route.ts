@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import { requireApiTrainer } from "@/lib/api-auth";
+import { leerJson } from "@/lib/validators";
 
 type NuevoEjercicio = {
   nombre?: string;
@@ -90,12 +91,15 @@ export async function POST(
   const trainerId =
     acceso.user.id;
 
-  let body: NuevoEjercicio;
+  const rawBody =
+    await leerJson(request);
 
-  try {
-    body =
-      (await request.json()) as NuevoEjercicio;
-  } catch {
+  if (
+    !rawBody ||
+    typeof rawBody !==
+      "object" ||
+    Array.isArray(rawBody)
+  ) {
     return Response.json(
       {
         error:
@@ -106,6 +110,9 @@ export async function POST(
       }
     );
   }
+
+  const body =
+    rawBody as NuevoEjercicio;
 
   const nombre =
     body.nombre?.trim();

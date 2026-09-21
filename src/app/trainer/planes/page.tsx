@@ -8,31 +8,13 @@ import {
 import prisma from "@/lib/prisma";
 import { requireTrainer } from "@/lib/auth-user";
 import { calcularProgresoPlan } from "@/lib/training-metrics";
+import { formatearFecha } from "@/lib/format";
 
 import PlanesClient from "@/components/trainer/PlanesClient";
 
 import type {
   PlanUI,
 } from "@/components/trainer/PlanesClient";
-
-/*
- * ============================================================
- * FORMATEAR FECHA
- * ============================================================
- */
-
-function formatearFecha(
-  fecha: Date
-) {
-  return new Intl.DateTimeFormat(
-    "es-CO",
-    {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    }
-  ).format(fecha);
-}
 
 /*
  * ============================================================

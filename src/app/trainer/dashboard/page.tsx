@@ -17,38 +17,7 @@ import {
 import prisma from "@/lib/prisma";
 import { requireTrainer } from "@/lib/auth-user";
 import { calcularProgresoPlan } from "@/lib/training-metrics";
-
-function formatearFecha(
-  fecha: Date | null
-) {
-  if (!fecha) {
-    return "Sin fecha";
-  }
-
-  return new Intl.DateTimeFormat(
-    "es-CO",
-    {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    }
-  ).format(fecha);
-}
-
-function iniciales(
-  nombre: string
-) {
-  return nombre
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(
-      (parte) =>
-        parte[0]
-    )
-    .join("")
-    .toUpperCase();
-}
+import { formatearFecha } from "@/lib/format";
 
 export default async function TrainerDashboardPage() {
   /*
@@ -678,7 +647,7 @@ export default async function TrainerDashboardPage() {
 
         {/* ENTRENAMIENTOS RECIENTES */}
 
-        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm">
+        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm xl:col-span-2">
           <div className="border-b border-slate-100 p-5">
             <h2 className="font-bold text-slate-900">
               Entrenamientos recientes
@@ -737,7 +706,8 @@ export default async function TrainerDashboardPage() {
                         />
 
                         {formatearFecha(
-                          sesion.completedAt
+                          sesion.completedAt,
+                          "Sin fecha"
                         )}
                       </div>
                     </div>

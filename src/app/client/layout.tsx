@@ -37,9 +37,9 @@ export default async function ClientLayout({
       {/* CONTENIDO */}
       {/* ====================================== */}
 
-      <main className="min-w-0">
+      <div className="min-w-0">
         {children}
-      </main>
+      </div>
     </div>
   );
 }

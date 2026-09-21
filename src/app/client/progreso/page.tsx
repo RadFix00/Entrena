@@ -12,6 +12,7 @@ import {
 
 import prisma from "@/lib/prisma";
 import { requireClient } from "@/lib/auth-user";
+import { formatearFecha } from "@/lib/format";
 
 import WeightChart from "@/components/progress/WeightChart";
 
@@ -32,19 +33,6 @@ function numero(
   return Number(
     valor.toString()
   );
-}
-
-function formatearFecha(
-  fecha: Date
-) {
-  return new Intl.DateTimeFormat(
-    "es-CO",
-    {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    }
-  ).format(fecha);
 }
 
 export default async function ClientProgressPage() {

@@ -28,8 +28,14 @@ export default async function AuthRedirectPage() {
       );
 
     case "ADMIN":
+      /*
+       * No existe un panel /admin dedicado todavía.
+       * Los administradores acceden al panel del
+       * entrenador (requireTrainer también acepta
+       * el rol ADMIN).
+       */
       redirect(
-        "/admin"
+        "/trainer/dashboard"
       );
 
     default:

@@ -100,7 +100,7 @@ function convertirDecimal(
    * con decimales opcionales.
    */
   if (
-    !/^\d+(?:\.\d+)?$/.test(
+    !/^\d+(?:\.\d{1,2})?$/.test(
       normalizado
     )
   ) {

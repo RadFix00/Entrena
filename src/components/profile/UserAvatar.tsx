@@ -1,3 +1,7 @@
+import {
+  obtenerIniciales,
+} from "@/lib/helpers";
+
 type Props = {
   name: string;
   avatarUrl?: string | null;
@@ -10,21 +14,6 @@ type Props = {
 
   className?: string;
 };
-
-function obtenerIniciales(
-  nombre: string
-) {
-  return nombre
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(
-      (parte) =>
-        parte[0]
-    )
-    .join("")
-    .toUpperCase();
-}
 
 const tamanos = {
   sm: "h-8 w-8 text-[10px]",
@@ -40,9 +29,7 @@ export default function UserAvatar({
   className = "",
 }: Props) {
   const iniciales =
-    obtenerIniciales(
-      name
-    );
+    obtenerIniciales(name);
 
   return (
     <div

@@ -26,48 +26,16 @@ import {
   signOut,
 } from "next-auth/react";
 
+import {
+  obtenerIniciales,
+} from "@/lib/helpers";
+
 type Props = {
   name: string;
   email: string;
   avatarUrl: string | null;
   role: string;
 };
-
-/*
- * ============================================================
- * INICIALES
- * ============================================================
- */
-
-function obtenerIniciales(
-  name: string
-) {
-  const partes = name
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean);
-
-  if (
-    partes.length === 0
-  ) {
-    return "U";
-  }
-
-  if (
-    partes.length === 1
-  ) {
-    return partes[0]
-      .slice(0, 2)
-      .toUpperCase();
-  }
-
-  return (
-    partes[0][0] +
-    partes[
-      partes.length - 1
-    ][0]
-  ).toUpperCase();
-}
 
 /*
  * ============================================================

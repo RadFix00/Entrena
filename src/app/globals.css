@@ -12,15 +12,37 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/*
+ * ============================================================
+ * TOKENS DE DISEÑO
+ * ============================================================
+ *
+ * Sistema visual de Entrena. La marca es "emerald" y convive
+ * con la paleta neutra "slate". Estos tokens son la fuente de
+ * verdad para los componentes reutilizables de `components/ui`.
+ *
+ * Colores de marca (emerald):
+ *   - brand        → acciones primarias, enlaces activos
+ *   - brand-hover  → estado hover de acciones primarias
+ *   - brand-soft   → fondos suaves / chips de éxito
+ *   - brand-muted  → fondos de icono suaves
+ *
+ * Radios:
+ *   - cards / paneles  → rounded-2xl (16px)
+ *   - botones / inputs → rounded-xl  (12px)
+ *
+ * Altura de control: h-11 (44px) para botones e inputs.
+ */
+@theme {
+  --color-brand: #059669; /* emerald-600 */
+  --color-brand-hover: #047857; /* emerald-700 */
+  --color-brand-soft: #ecfdf5; /* emerald-50 */
+  --color-brand-muted: #d1fae5; /* emerald-100 */
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, Arial, sans-serif;
 }

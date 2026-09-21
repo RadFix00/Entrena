@@ -1,25 +1,12 @@
 import prisma from "@/lib/prisma";
 import { requireTrainer } from "@/lib/auth-user";
 import { calcularProgresoPlan } from "@/lib/training-metrics";
+import { obtenerIniciales } from "@/lib/helpers";
+import { formatearFecha } from "@/lib/format";
 
 import ClientesClient, {
   type ClienteUI,
 } from "@/components/trainer/ClientesClient";
-
-function obtenerIniciales(
-  nombre: string
-) {
-  return nombre
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(
-      (parte) =>
-        parte[0]
-    )
-    .join("")
-    .toUpperCase();
-}
 
 function convertirEstado(
   estado:
@@ -37,23 +24,6 @@ function convertirEstado(
     case "PAUSED":
       return "Pausado";
   }
-}
-
-function formatearFecha(
-  fecha: Date | null
-) {
-  if (!fecha) {
-    return "Sin registros";
-  }
-
-  return new Intl.DateTimeFormat(
-    "es-CO",
-    {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    }
-  ).format(fecha);
 }
 
 export default async function ClientesPage() {

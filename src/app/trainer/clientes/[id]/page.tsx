@@ -25,21 +25,7 @@ import {
 import prisma from "@/lib/prisma";
 import { requireTrainer } from "@/lib/auth-user";
 import { calcularProgresoPlan } from "@/lib/training-metrics";
-
-function obtenerIniciales(
-  nombre: string
-) {
-  return nombre
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(
-      (parte) =>
-        parte[0]
-    )
-    .join("")
-    .toUpperCase();
-}
+import { formatearFecha } from "@/lib/format";
 
 function calcularEdad(
   fecha: Date | null | undefined
@@ -70,23 +56,6 @@ function calcularEdad(
   }
 
   return edad;
-}
-
-function formatearFecha(
-  fecha: Date | null
-) {
-  if (!fecha) {
-    return "Sin registros";
-  }
-
-  return new Intl.DateTimeFormat(
-    "es-CO",
-    {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    }
-  ).format(fecha);
 }
 
 export default async function ClientePage({
@@ -410,7 +379,7 @@ export default async function ClientePage({
             </div>
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Link
               href={`/trainer/clientes/${cliente.id}/editar`}
               className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
@@ -464,6 +433,17 @@ export default async function ClientePage({
               />
 
               Adherencia
+            </Link>
+
+            <Link
+              href={`/trainer/clientes/${cliente.id}/fuerza`}
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-violet-200 bg-violet-50 px-4 text-sm font-semibold text-violet-700 transition hover:bg-violet-100"
+            >
+              <Dumbbell
+                size={17}
+              />
+
+              Fuerza
             </Link>
           </div>
         </div>

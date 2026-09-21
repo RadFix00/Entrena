@@ -12,6 +12,7 @@ import {
 
 import prisma from "@/lib/prisma";
 import { requireTrainer } from "@/lib/auth-user";
+import { fechaParaInput } from "@/lib/format";
 
 import TrainerCalendarClient from "@/components/trainer/TrainerCalendarClient";
 
@@ -326,14 +327,9 @@ export default async function CalendarioClientePage({
                 dia.position,
 
               scheduledDate:
-                dia.scheduledDate
-                  ? dia.scheduledDate
-                      .toISOString()
-                      .slice(
-                        0,
-                        10
-                      )
-                  : null,
+                fechaParaInput(
+                  dia.scheduledDate
+                ),
 
               completedAt:
                 completedAt
@@ -421,14 +417,9 @@ export default async function CalendarioClientePage({
             plan.status,
 
           startDate:
-            plan.startDate
-              ? plan.startDate
-                  .toISOString()
-                  .slice(
-                    0,
-                    10
-                  )
-              : null,
+            fechaParaInput(
+              plan.startDate
+            ),
         }}
         dias={
           dias

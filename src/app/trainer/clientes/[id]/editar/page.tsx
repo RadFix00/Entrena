@@ -4,22 +4,11 @@ import {
 
 import prisma from "@/lib/prisma";
 import { requireTrainer } from "@/lib/auth-user";
+import { fechaParaInput } from "@/lib/format";
 
 import EditarClienteClient, {
   type ClienteEditarInicial,
 } from "@/components/trainer/EditarClienteClient";
-
-function fechaParaInput(
-  fecha: Date | null
-) {
-  if (!fecha) {
-    return "";
-  }
-
-  return fecha
-    .toISOString()
-    .slice(0, 10);
-}
 
 export default async function EditarClientePage({
   params,

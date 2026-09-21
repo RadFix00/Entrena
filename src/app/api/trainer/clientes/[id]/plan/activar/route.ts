@@ -249,8 +249,9 @@ export async function POST(
    * 1. Archivar cualquier ACTIVE anterior.
    * 2. Activar este DRAFT.
    */
-  await prisma.$transaction(
-    async (tx) => {
+  try {
+    await prisma.$transaction(
+      async (tx) => {
       await tx.trainingPlan.updateMany({
         where: {
           trainerId,
@@ -294,6 +295,22 @@ export async function POST(
       });
     }
   );
+  } catch (error) {
+    console.error(
+      "Error activando plan:",
+      error
+    );
+
+    return Response.json(
+      {
+        error:
+          "No se pudo activar el plan.",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
 
   return Response.json({
     ok: true,

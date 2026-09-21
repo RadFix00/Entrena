@@ -1,5 +1,11 @@
 import prisma from "@/lib/prisma";
 import { requireApiTrainer } from "@/lib/api-auth";
+import {
+  convertirDecimal,
+  leerJson,
+} from "@/lib/validators";
+
+class ForbiddenError extends Error {}
 
 type EjercicioPayload = {
   id?: number;
@@ -73,41 +79,6 @@ async function obtenerContexto(
     trainerId,
     relacion,
   };
-}
-
-function convertirCarga(
-  carga: string | undefined
-): number | null {
-  if (!carga) {
-    return null;
-  }
-
-  const normalizada =
-    carga
-      .replace(",", ".")
-      .trim();
-
-  const coincidencia =
-    normalizada.match(
-      /-?\d+(?:\.\d+)?/
-    );
-
-  if (!coincidencia) {
-    return null;
-  }
-
-  const numero =
-    Number(
-      coincidencia[0]
-    );
-
-  if (
-    !Number.isFinite(numero)
-  ) {
-    return null;
-  }
-
-  return numero;
 }
 
 /*
@@ -397,12 +368,15 @@ export async function PUT(
   /*
    * 3. Body.
    */
-  let body: PlanPayload;
+  const rawBody =
+    await leerJson(request);
 
-  try {
-    body =
-      (await request.json()) as PlanPayload;
-  } catch {
+  if (
+    !rawBody ||
+    typeof rawBody !==
+      "object" ||
+    Array.isArray(rawBody)
+  ) {
     return Response.json(
       {
         error:
@@ -413,6 +387,9 @@ export async function PUT(
       }
     );
   }
+
+  const body =
+    rawBody as PlanPayload;
 
   const nombrePlan =
     body.nombrePlan?.trim();
@@ -593,7 +570,7 @@ export async function PUT(
             if (
               !idsValidos.has(id)
             ) {
-              throw new Error(
+              throw new ForbiddenError(
                 "Uno de los ejercicios seleccionados no pertenece al entrenador."
               );
             }
@@ -667,7 +644,7 @@ export async function PUT(
                                   "1",
 
                                 loadKg:
-                                  convertirCarga(
+                                  convertirDecimal(
                                     ejercicio.carga
                                   ),
 
@@ -822,6 +799,21 @@ export async function PUT(
         "Plan guardado correctamente.",
     });
   } catch (error) {
+    if (
+      error instanceof
+      ForbiddenError
+    ) {
+      return Response.json(
+        {
+          error:
+            error.message,
+        },
+        {
+          status: 403,
+        }
+      );
+    }
+
     console.error(
       "Error guardando plan:",
       error
@@ -830,9 +822,7 @@ export async function PUT(
     return Response.json(
       {
         error:
-          error instanceof Error
-            ? error.message
-            : "No se pudo guardar el plan.",
+          "No se pudo guardar el plan.",
       },
       {
         status: 500,

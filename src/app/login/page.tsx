@@ -2,6 +2,7 @@
 
 import {
   FormEvent,
+  useEffect,
   useState,
 } from "react";
 
@@ -22,6 +23,11 @@ import {
   LockKeyhole,
   Mail,
 } from "lucide-react";
+
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import { Card } from "@/components/ui/Card";
+import Alert from "@/components/ui/Alert";
 
 export default function LoginPage() {
   const router =
@@ -47,6 +53,37 @@ export default function LoginPage() {
 
   const [error, setError] =
     useState("");
+
+  const [success, setSuccess] =
+    useState("");
+
+  /*
+   * Muestra confirmación si venimos
+   * de cambiar o restablecer la contraseña.
+   */
+  useEffect(() => {
+    const params =
+      new URLSearchParams(
+        window.location.search
+      );
+
+    if (
+      params.get(
+        "passwordChanged"
+      ) === "1"
+    ) {
+      setSuccess(
+        "Tu contraseña fue actualizada. Vuelve a iniciar sesión."
+      );
+    } else if (
+      params.get("reset") ===
+      "success"
+    ) {
+      setSuccess(
+        "Tu contraseña fue restablecida. Ya puedes iniciar sesión."
+      );
+    }
+  }, []);
 
   async function handleSubmit(
     event: FormEvent<HTMLFormElement>
@@ -75,10 +112,6 @@ export default function LoginPage() {
 
             password,
 
-            /*
-             * Nosotros manejamos
-             * la redirección.
-             */
             redirect: false,
           }
         );
@@ -111,9 +144,7 @@ export default function LoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50 p-4">
       <div className="w-full max-w-md">
-        {/* ====================================== */}
         {/* LOGO */}
-        {/* ====================================== */}
 
         <div className="mb-8 text-center">
           <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-sm">
@@ -131,11 +162,9 @@ export default function LoginPage() {
           </p>
         </div>
 
-        {/* ====================================== */}
         {/* CARD */}
-        {/* ====================================== */}
 
-        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <Card className="p-6 sm:p-8">
           <div>
             <h2 className="text-xl font-bold text-slate-900">
               Iniciar sesión
@@ -153,9 +182,7 @@ export default function LoginPage() {
             }
             className="mt-6 space-y-5"
           >
-            {/* ================================== */}
             {/* EMAIL */}
-            {/* ================================== */}
 
             <div>
               <label
@@ -165,40 +192,35 @@ export default function LoginPage() {
                 Correo electrónico
               </label>
 
-              <div className="relative">
-                <Mail
-                  size={18}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-                />
-
-                <input
-                  id="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  disabled={
-                    cargando
-                  }
-                  value={
-                    email
-                  }
-                  onChange={(
-                    event
-                  ) =>
-                    setEmail(
-                      event.target
-                        .value
-                    )
-                  }
-                  placeholder="correo@ejemplo.com"
-                  className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-50"
-                />
-              </div>
+              <Input
+                id="email"
+                type="email"
+                autoComplete="email"
+                required
+                disabled={
+                  cargando
+                }
+                value={
+                  email
+                }
+                onChange={(
+                  event
+                ) =>
+                  setEmail(
+                    event.target
+                      .value
+                  )
+                }
+                placeholder="correo@ejemplo.com"
+                leftIcon={
+                  <Mail
+                    size={18}
+                  />
+                }
+              />
             </div>
 
-            {/* ================================== */}
             {/* PASSWORD */}
-            {/* ================================== */}
 
             <div>
               <div className="mb-2 flex items-center justify-between gap-4">
@@ -217,102 +239,99 @@ export default function LoginPage() {
                 </Link>
               </div>
 
-              <div className="relative">
-                <LockKeyhole
-                  size={18}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-                />
-
-                <input
-                  id="password"
-                  type={
-                    mostrarPassword
-                      ? "text"
-                      : "password"
-                  }
-                  autoComplete="current-password"
-                  required
-                  minLength={8}
-                  disabled={
-                    cargando
-                  }
-                  value={
-                    password
-                  }
-                  onChange={(
-                    event
-                  ) =>
-                    setPassword(
-                      event.target
-                        .value
-                    )
-                  }
-                  placeholder="Tu contraseña"
-                  className="h-11 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-12 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 disabled:cursor-not-allowed disabled:bg-slate-50"
-                />
-
-                <button
-                  type="button"
-                  disabled={
-                    cargando
-                  }
-                  onClick={() =>
-                    setMostrarPassword(
-                      (actual) =>
-                        !actual
-                    )
-                  }
-                  className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
-                  aria-label={
-                    mostrarPassword
-                      ? "Ocultar contraseña"
-                      : "Mostrar contraseña"
-                  }
-                >
-                  {mostrarPassword ? (
-                    <EyeOff
-                      size={18}
-                    />
-                  ) : (
-                    <Eye
-                      size={18}
-                    />
-                  )}
-                </button>
-              </div>
+              <Input
+                id="password"
+                type={
+                  mostrarPassword
+                    ? "text"
+                    : "password"
+                }
+                autoComplete="current-password"
+                required
+                disabled={
+                  cargando
+                }
+                value={
+                  password
+                }
+                onChange={(
+                  event
+                ) =>
+                  setPassword(
+                    event.target
+                      .value
+                  )
+                }
+                placeholder="Tu contraseña"
+                leftIcon={
+                  <LockKeyhole
+                    size={18}
+                  />
+                }
+                rightElement={
+                  <button
+                    type="button"
+                    disabled={
+                      cargando
+                    }
+                    onClick={() =>
+                      setMostrarPassword(
+                        (actual) =>
+                          !actual
+                      )
+                    }
+                    className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-50"
+                    aria-label={
+                      mostrarPassword
+                        ? "Ocultar contraseña"
+                        : "Mostrar contraseña"
+                    }
+                  >
+                    {mostrarPassword ? (
+                      <EyeOff
+                        size={18}
+                      />
+                    ) : (
+                      <Eye
+                        size={18}
+                      />
+                    )}
+                  </button>
+                }
+              />
             </div>
 
-            {/* ================================== */}
-            {/* ERROR */}
-            {/* ================================== */}
+            {/* MENSAJES */}
 
-            {error && (
-              <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-                {error}
-              </div>
+            {success && (
+              <Alert variant="success">
+                {success}
+              </Alert>
             )}
 
-            {/* ================================== */}
-            {/* BOTÓN */}
-            {/* ================================== */}
+            {error && (
+              <Alert variant="error">
+                {error}
+              </Alert>
+            )}
 
-            <button
+            {/* BOTÓN */}
+
+            <Button
               type="submit"
-              disabled={
+              loading={
                 cargando
               }
-              className="flex h-11 w-full items-center justify-center rounded-xl bg-emerald-600 px-5 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+              className="w-full"
             >
               {cargando
                 ? "Ingresando..."
                 : "Iniciar sesión"}
-            </button>
+            </Button>
           </form>
-        </div>
+        </Card>
 
-        {/* ====================================== */}
         {/* FOOTER */}
-        {/* ====================================== */}
 
         <p className="mt-6 text-center text-xs text-slate-400">
           Entrena · Plataforma de entrenamiento

@@ -49,9 +49,9 @@ export default async function TrainerLayout({
         {/* CONTENIDO */}
         {/* ====================================== */}
 
-        <main className="min-w-0">
+        <div className="min-w-0">
           {children}
-        </main>
+        </div>
       </div>
     </div>
   );

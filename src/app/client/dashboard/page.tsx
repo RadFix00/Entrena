@@ -17,6 +17,7 @@ import { notFound } from "next/navigation";
 
 import prisma from "@/lib/prisma";
 import { requireClient } from "@/lib/auth-user";
+import { formatearFecha } from "@/lib/format";
 
 import StartWorkoutButton from "@/components/client/StartWorkoutButton";
 import UserAvatar from "@/components/profile/UserAvatar";
@@ -32,23 +33,6 @@ function claveDia(
   posicion: number
 ) {
   return `${semana}:${posicion}`;
-}
-
-function formatearFecha(
-  fecha: Date | null
-) {
-  if (!fecha) {
-    return "Sin registros";
-  }
-
-  return new Intl.DateTimeFormat(
-    "es-CO",
-    {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    }
-  ).format(fecha);
 }
 
 /*

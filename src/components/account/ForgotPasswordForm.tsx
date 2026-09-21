@@ -1,13 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import {
+  useState,
+} from "react";
 
 import {
-  CheckCircle2,
-  Loader2,
   Mail,
-  Send,
 } from "lucide-react";
+
+import Input from "@/components/ui/Input";
+import Button from "@/components/ui/Button";
+import Alert from "@/components/ui/Alert";
 
 export default function ForgotPasswordForm() {
   const [email, setEmail] =
@@ -23,7 +26,8 @@ export default function ForgotPasswordForm() {
     useState("");
 
   async function handleSubmit(
-    event: React.FormEvent<HTMLFormElement>
+    event:
+      React.FormEvent<HTMLFormElement>
   ) {
     event.preventDefault();
 
@@ -49,21 +53,22 @@ export default function ForgotPasswordForm() {
     try {
       setLoading(true);
 
-      const response = await fetch(
-        "/api/auth/forgot-password",
-        {
-          method: "POST",
+      const response =
+        await fetch(
+          "/api/auth/forgot-password",
+          {
+            method: "POST",
 
-          headers: {
-            "Content-Type":
-              "application/json",
-          },
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
 
-          body: JSON.stringify({
-            email: cleanEmail,
-          }),
-        }
-      );
+            body: JSON.stringify({
+              email: cleanEmail,
+            }),
+          }
+        );
 
       const data =
         (await response.json()) as {
@@ -104,13 +109,8 @@ export default function ForgotPasswordForm() {
           Correo electrónico
         </span>
 
-        <div className="relative mt-2">
-          <Mail
-            size={17}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
-          />
-
-          <input
+        <div className="mt-2">
+          <Input
             type="email"
             value={email}
             onChange={(event) =>
@@ -122,57 +122,40 @@ export default function ForgotPasswordForm() {
             autoComplete="email"
             placeholder="correo@ejemplo.com"
             disabled={loading}
-            className="h-12 w-full rounded-xl border border-slate-200 bg-white pl-10 pr-4 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 disabled:cursor-not-allowed disabled:bg-slate-50"
+            leftIcon={
+              <Mail
+                size={17}
+              />
+            }
           />
         </div>
       </label>
 
       {error && (
-        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+        <Alert variant="error">
           {error}
-        </div>
+        </Alert>
       )}
 
       {success && (
-        <div className="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-4">
-          <CheckCircle2
-            size={19}
-            className="mt-0.5 shrink-0 text-emerald-600"
-          />
-
-          <div>
-            <p className="text-sm font-bold text-emerald-800">
-              Solicitud recibida
-            </p>
-
-            <p className="mt-1 text-sm leading-5 text-emerald-700">
-              {success}
-            </p>
-          </div>
-        </div>
+        <Alert variant="success">
+          {success}
+        </Alert>
       )}
 
-      <button
+      <Button
         type="submit"
+        variant="primary"
+        loading={loading}
         disabled={
-          loading ||
-          Boolean(success)
+          loading || Boolean(success)
         }
-        className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-5 text-sm font-bold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full"
       >
-        {loading ? (
-          <Loader2
-            size={17}
-            className="animate-spin"
-          />
-        ) : (
-          <Send size={17} />
-        )}
-
         {loading
           ? "Procesando..."
           : "Enviar enlace de recuperación"}
-      </button>
+      </Button>
     </form>
   );
 }

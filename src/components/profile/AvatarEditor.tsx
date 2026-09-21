@@ -22,6 +22,10 @@ import {
   X,
 } from "lucide-react";
 
+import {
+  obtenerIniciales,
+} from "@/lib/helpers";
+
 type Props = {
   name: string;
 
@@ -38,21 +42,6 @@ type Modo =
 type FacingMode =
   | "user"
   | "environment";
-
-function obtenerIniciales(
-  nombre: string
-) {
-  return nombre
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map(
-      (parte) =>
-        parte[0]
-    )
-    .join("")
-    .toUpperCase();
-}
 
 /*
  * ============================================================
